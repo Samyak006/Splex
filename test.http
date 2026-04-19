@@ -1,0 +1,29 @@
+POST http://localhost:8000/users/ 
+content-type: application/json
+
+{
+    "name":"Steve Smith",
+    "email":"test2@gmail.com",
+    "secret_hashed_password":"password123"
+}
+
+###
+POST http://localhost:8000/users/ 
+content-type: application/json
+
+{
+    "name":"John Doe",
+    "email":"test@gmail.com",
+    "secret_hashed_password":"password123"
+}
+
+###
+POST http://localhost:8000/users/authenticate HTTP/1.1
+content-type: application/json
+
+{
+    "email":"test2@gmail.com",
+    "password":"password123"
+}
+###
+GET http://localhost:8000/users/?email=test1@gmail.com

@@ -5,6 +5,7 @@ from sqlmodel import Field, SQLModel, Relationship
 class UserShare(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     share_id: int = Field(foreign_key="share.id", primary_key=True)
+    transaction_id: int = Field(foreign_key="usertransaction.id", sa_column_kwargs={"name":"transaction_id"})
     amount: float
 
 class UserShareCreate(SQLModel):

@@ -1,20 +1,25 @@
 from fastapi import FastAPI, Depends
 from sqlmodel import SQLModel, Session
-from Splex.routing import users, userTransactions, share, userShare
-from Splex.database.sessions import get_session
-from Splex.testing.test_service import test_get_user_share
-
+from Splex.routing import transactions
+from Splex.service.plaid.transactions import  get_transactions
+from Splex.config import settings
 app = FastAPI()
-app.include_router(users.router)
-app.include_router(userTransactions.router)
-app.include_router(share.router)
-app.include_router(userShare.router)
+
+if not settings.is_only_integration:
+	from Splex.database.sessions import get_session
+	from Splex.routing import users, userTransactions, share, userShare
+	print("Running in integration mode, skipping router inclusion.")
+	app.include_router(users.router)
+	app.include_router(userTransactions.router)
+	app.include_router(share.router)
+	app.include_router(userShare.router)
+app.include_router(transactions.router)
 
 @app.get("/")
 async def root():
 	return {"message":"Hello World"}
 
 @app.get("/test")
-async def test_db(session: Session = Depends(get_session)):
-	return await test_get_user_share(session)
+def test():
+	return get_transactions()
 

@@ -2,4 +2,5 @@ fastapi[standard]
 bcrypt
 python-tds
 pydantic[email]
+plaid-python
 

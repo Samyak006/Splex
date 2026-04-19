@@ -8,6 +8,7 @@ class UserTransaction(SQLModel, table=True):
     amount: float
     description: str
     user: User = Relationship(back_populates="transactions")  # Relationship to User model
+    share_id: int | None = Field(default=None, foreign_key="share.id", sa_column_kwargs={"name":"share_id"})
 
 class UserTransactionCreate(SQLModel):
     user_id: int
