@@ -3,4 +3,5 @@ bcrypt
 python-tds
 pydantic[email]
 plaid-python
-
+sqlmodel
+sqlalchemy-pytds
