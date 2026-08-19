@@ -4,4 +4,7 @@ python-tds
 pydantic[email]
 plaid-python
 sqlmodel
+uv
+pathlib
 sqlalchemy-pytds
+pyjwt
