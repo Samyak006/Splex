@@ -1,2 +1,4 @@
 .env
 notes.md
+app/node_modules
+app/splex/dist
