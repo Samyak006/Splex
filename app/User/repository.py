@@ -8,7 +8,7 @@ class UserRepository:
     def __init__(self, session: Session):
         self.session = session
     
-    async def get_user_by_email(self, email:str)->User:
+    async def get_user_by_email(self, email:str)->User|None:
         """
         Finds a user by email
 
@@ -18,8 +18,14 @@ class UserRepository:
         Returns:
             returns user Object
         """
-        result = self.session.exec(select(User).where(User.email == email)).first() 
-        return UserRead(**result.model_dump())
+        try:
+            result = self.session.exec(select(User).where(User.email == email)).first() 
+            if result:
+                return UserRead(**result.model_dump())
+            return None
+        except Exception as e:
+            print("Error while fetching email:", email, " with error:", e)
+            raise e
 
     async def create_user(self, user: UserCreate) -> bool:
         """

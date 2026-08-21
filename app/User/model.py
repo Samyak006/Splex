@@ -9,6 +9,8 @@ class User(SQLModel, table=True):
     name: str 
     email: EmailStr 
     secret_hashed_password: str
+
+    transaction_id: int|None  = Field(default=None, foreign_key="transaction.id")
     
 class UserCreate(BaseModel):
     name: str

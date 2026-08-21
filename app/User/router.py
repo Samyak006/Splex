@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response, Request
+from fastapi import APIRouter, Depends, Response, Request, HTTPException
 from sqlmodel import Session
 from pydantic import EmailStr
 from app.User.model import UserCreate , UserAuthenticate
@@ -25,18 +25,20 @@ async def authenticate(
         response: Response,
         user_service: UserService = Depends(get_user_service)
     ):
-    user_data = user_service.authenticate_user(userAuth) 
-    if user_data is not None:
-        token, exp = create_access_token(data = {"sub":userAuth.email})
-        response.set_cookie(
-            key='token',
-            value=token,
-            expires=exp,
-            httponly=True
+    user_data = await user_service.authenticate_user(userAuth) 
+    if user_data is None:
+        raise HTTPException(
+            status_code = HTTPStatus.UNAUTHORIZED,
+            detail = "Invalid Credentials"
         )
-        return HTTPStatus.OK
-    else:
-        return HTTPStatus.UNAUTHORIZED
+    token, exp = create_access_token(data = {"sub":userAuth.email})
+    response.set_cookie(
+        key='token',
+        value=token,
+        expires=exp,
+        httponly=True
+    )
+    return HTTPStatus.OK
 
 @router.get("/")
 async def read_user(
@@ -51,7 +53,3 @@ async def read_user(
             return await user_service.get_user_by_email(email)
         return HTTPStatus.FORBIDDEN
     return HTTPStatus.BAD_REQUEST
-
-@router.get("/")
-async def read_users(session: Session = Depends(get_session)):
-    return await get_user(session)

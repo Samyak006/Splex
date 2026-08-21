@@ -21,7 +21,7 @@ class UserService:
         Returns:
             User: The created user object with an assigned ID.
         """
-        if await self.UserRepository.get_user_by_email(user.email) is not None:
+        if await self.UserRepository.get_user_by_email(user.email) is None:
             await self.UserRepository.create_user(user)
             return True   
         return False
