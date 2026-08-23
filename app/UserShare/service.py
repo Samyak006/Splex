@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from fastapi import Depends
-from Splex.database.sessions import get_session
-from Splex.model.userShare import UserShare, UserShareCreate, UserShareUpdate, UserShareRead
+from app.database.sessions import get_session
+from app.UserShare.model import UserShare, UserShareCreate, UserShareUpdate, UserShareRead
 
 async def get_all_user_shares(session: Session = Depends(get_session)) -> list[UserShareRead]:
     '''

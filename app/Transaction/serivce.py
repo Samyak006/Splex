@@ -1,55 +1,31 @@
-from sqlmodel import Session, select
-from fastapi import Depends
-from Splex.database.sessions import get_session
-from Splex.model.userTransactions import UserTransaction, UserTransactionCreate, UserTransactionUpdate
+from sqlmodel import Session
+from app.Transaction.repository import TransactionRepository
+from app.Transaction.model import TransactionRead, TransactionCreate, TransactionUpdate
 
-async def readTransactions(session: Session = Depends(get_session))-> list[UserTransaction]:
-    '''
-        Endpoint to retrieve all user transactions.
-    '''
-    transactions = session.exec(select(UserTransaction)).all() 
-    return transactions
+class TransactionService:
+    def __init__(self, session: Session):
+        self.transaction_repo = TransactionRepository(session)
 
-async def addTransaction(user_transaction:UserTransactionCreate, session: Session = Depends(get_session)) -> UserTransaction:
-    '''
-        Endpoint to add a transaction for a specific user.
-    '''
-    try:
-        transaction = UserTransaction(**user_transaction.dict())
-        session.add(transaction)
-        session.commit()
-        session.refresh(transaction)
-        return True
-    except Exception as e:
-        print("Error adding transaction:", e)
-        raise e
+    async def read_transactions(self) -> list[TransactionRead]:
+        '''
+            Retrieves all transactions.
+        '''
+        return await self.transaction_repo.read_transactions()
 
-async def getTransactionByUserId(user_id: int, session: Session = Depends(get_session)) -> list[UserTransaction]:
-    '''
-        Retrieves transactions for a specific user by user ID.
-    '''
-    try:
-        transactions = session.exec(select(UserTransaction).where(UserTransaction.user_id == user_id)).all()
-        return transactions
-    except Exception as e:
-        print("Error retrieving transactions:", e)
-        raise e
+    async def add_transaction(self, transaction: TransactionCreate) -> TransactionRead:
+        '''
+            Adds a new transaction.
+        '''
+        return await self.transaction_repo.add_transaction(transaction)
 
-async def updateTransactionById(transaction_id: int, user_transaction: UserTransactionUpdate, session: Session = Depends(get_session)) -> bool:
-    '''
-        Updates a specific transaction by its ID.
-    '''
-    try:
-        transaction = session.get(UserTransaction, transaction_id)
-        if not transaction:
-            return False
-        for key, value in user_transaction.dict().items():
-            if value is not None:
-                setattr(transaction, key, value)
-        session.add(transaction)
-        session.commit()
-        session.refresh(transaction)
-        return True
-    except Exception as e:
-        print("Error updating transaction:", e)
-        raise e
+    async def get_transactions_by_user_id(self, user_id: int) -> list[TransactionRead]:
+        '''
+            Retrieves transactions for a specific user.
+        '''
+        return await self.transaction_repo.get_transaction_by_user_id(user_id)
+
+    async def update_transaction(self, transaction_id: int, transaction: TransactionUpdate) -> bool:
+        '''
+            Updates a transaction by ID.
+        '''
+        return await self.transaction_repo.update_transaction_by_id(transaction_id, transaction)

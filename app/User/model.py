@@ -9,9 +9,12 @@ class User(SQLModel, table=True):
     name: str 
     email: EmailStr 
     secret_hashed_password: str
-
-    transaction_id: int|None  = Field(default=None, foreign_key="transaction.id")
     
+    #Relationship
+    userShares: list["Share"] = Relationship(back_populates="users") #type: ignore
+    transactions: list["Transaction"] = Relationship(back_populates="user") #type: ignore
+    shares: list["Share"] = Relationship(back_populates="createdByUser", sa_relationship_kwargs={"foreign_keys": "[Share.createdBy]"}) #type: ignore
+
 class UserCreate(BaseModel):
     name: str
     email: EmailStr

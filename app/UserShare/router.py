@@ -2,10 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
 from pydantic import EmailStr
 from typing import Optional
-from Splex.model.userShare import UserShare, UserShareCreate, UserShareUpdate, UserShareRead, UserShareKey
-from Splex.database.sessions import get_session
-from Splex.service.userShare import get_all_user_shares, add_user_share, get_user_share_by_id, delete_user_share_by_id, update_user_share_by_id
-from Splex.model.results import Result
+from app.UserShare.model import UserShare, UserShareCreate, UserShareUpdate, UserShareRead, UserShareKey
+from app.database.sessions import get_session
+from app.UserShare.service import get_all_user_shares, add_user_share, get_user_share_by_id, delete_user_share_by_id, update_user_share_by_id
 from http import HTTPStatus 
 
 router = APIRouter(

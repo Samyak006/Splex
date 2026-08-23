@@ -33,7 +33,7 @@ class TransactionRepository:
         '''
         try:
             transactions = self.session.exec(select(Transaction).where(Transaction.user_id == user_id)).all()
-            return Transaction.model_validate(transactions)
+            return [TransactionRead.model_validate(transaction) for transaction in transactions]
         except Exception as e:
             print("Error retrieving transactions:", e)
             raise e
@@ -46,9 +46,8 @@ class TransactionRepository:
             transaction = self.session.get(Transaction, transaction_id)
             if not transaction:
                 return False
-            for key, value in user_transaction.model_dump().items():
-                if value is not None:
-                    setattr(transaction, key, value)
+            for key, value in user_transaction.model_dump(exclude_unset=True).items():
+                setattr(transaction, key, value)
             self.session.add(transaction)
             self.session.commit()
             self.session.refresh(transaction)
