@@ -1,67 +1,31 @@
-from sqlmodel import Session, select
-from app.Share.model import Share, ShareCreate, ShareUpdate, ShareRead
+from sqlmodel import Session
+from app.Share.repository import ShareRepository
+from app.Share.model import ShareRead, ShareCreate, ShareUpdate
 
 class ShareService:
     def __init__(self, session: Session):
-        self.session = session
+        self._repository = ShareRepository(session)
 
     async def get_all_shares(self) -> list[ShareRead]:
         '''
-            Retrieves all shared resources.
+            Retrieves all transactions.
         '''
-        shares = self.session.exec(select(Share)).all()
-        return shares
+        return await self._repository.get_all_shares()
 
-    async def add_share(self, share_data: ShareCreate) -> ShareRead:
+    async def add_share(self, share: ShareCreate) -> ShareRead:
         '''
-            Adds a new shared resource.
+            Adds a new transaction.
         '''
-        try:
-            share = Share.model_validate(share_data)
-            self.session.add(share)
-            self.session.commit()
-            self.session.refresh(share)
-            return ShareRead.model_validate(share)
-        except Exception as e:
-            print("Error adding share:", e)
-            raise e
+        return await self._repository.add_share(share)
 
-    async def get_share_by_id(self, share_id: int) -> ShareRead | None:
+    async def get_share_by_user_id(self, user_id: int) -> list[ShareRead]:
         '''
-            Retrieves a specific shared resource by ID.
+            Retrieves transactions for a specific user.
         '''
-        share = self.session.get(Share, share_id)
-        return share
+        return await self._repository.get_share_by_id(user_id)
 
-    async def delete_share_by_id(self, share_id: int) -> bool:
+    async def update_share_by_id(self, share_id: int, share: ShareUpdate) -> bool:
         '''
-            Deletes a specific shared resource by ID.
+            Updates a transaction by ID.
         '''
-        try:
-            share = self.session.get(Share, share_id)
-            if not share:
-                return False
-            self.session.delete(share)
-            self.session.commit()
-            return True
-        except Exception as e:
-            print("Error deleting share:", e)
-            raise e
-
-    async def update_share_by_id(self, share_id: int, share_data: ShareUpdate) -> bool:
-        '''
-            Updates a specific shared resource by ID.
-        '''
-        try:
-            share = self.session.get(Share, share_id)
-            if not share:
-                return False
-            for key, value in share_data.model_dump(exclude_unset=None).items():
-                setattr(share, key, value)
-            self.session.add(share)
-            self.session.commit()
-            self.session.refresh(share)
-            return True
-        except Exception as e:
-            print("Error updating share:", e)
-            raise e
+        return await self._repository.update_share_by_id(share_id, share)

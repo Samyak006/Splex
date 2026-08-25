@@ -29,10 +29,10 @@ class ShareUpdate(SQLModel):
     description: Optional[str] = None
     amount: Optional[float] = None
 
-class ShareRead(BaseModel):
+class ShareRead(SQLModel):
     id: int
+    transaction_id: int
     createdBy: int
     description: str
     amount: float
-    transaction_id: int
     
